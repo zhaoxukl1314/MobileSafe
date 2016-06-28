@@ -4,8 +4,29 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="功能列表"
+        android:textSize="40dp"
+        android:textColor="#000000"
+        android:background="#8800FF00"/>
+
+    <com.example.zhaoxu.mobilesafe.View.FocusTextView
+        android:singleLine="true"
+        android:ellipsize="marquee"
         android:layout_height="wrap_content"
-        android:text="我是主界面"/>
+        android:layout_width="match_parent"
+        android:text="首次开发小型应用程序，实现手机安全卫士全功能，滚动文本显示"
+        android:textSize="22dp"
+        android:textColor="#000000"/>
+
+    <GridView
+        android:layout_marginTop="60dp"
+        android:verticalSpacing="30dp"
+        android:numColumns="3"
+        android:id="@+id/grid_home"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></GridView>
 
 </LinearLayout>

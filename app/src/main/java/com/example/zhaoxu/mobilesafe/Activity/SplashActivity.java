@@ -1,9 +1,12 @@
 package com.example.zhaoxu.mobilesafe.Activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,8 +18,12 @@ import android.widget.Toast;
 import com.example.zhaoxu.mobilesafe.R;
 import com.example.zhaoxu.mobilesafe.Utils.StreamTools;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -42,6 +49,7 @@ public class SplashActivity extends Activity {
 
                 case NEW_VERSION:
                     Log.e(TAG,"弹出升级对话框");
+                    showUpdateDialog();
                     break;
 
                 case INTERNET_ERROR:
@@ -51,6 +59,40 @@ public class SplashActivity extends Activity {
             }
         }
     };
+    private String description;
+    private String apkurl;
+    private String path;
+    private TextView downLoadTextView;
+
+    private void showUpdateDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("升级窗口");
+        builder.setMessage(description);
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                dialogInterface.dismiss();
+                enterHome();
+            }
+        });
+        builder.setPositiveButton("确定升级", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.e(TAG,"点击确定升级");
+                FinalHttp finalHttp = new FinalHttp();
+                path = "storage/emulated/0/mobilesafe3.0";
+                finalHttp.download(apkurl, path,new ajaxCallBack());
+            }
+        });
+        builder.setNegativeButton("暂不升级", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                enterHome();
+            }
+        });
+        builder.show();
+    }
 
     private void enterHome() {
         Intent intent = new Intent(this,HomeActivity.class);
@@ -68,6 +110,7 @@ public class SplashActivity extends Activity {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.2f,1.0f);
         alphaAnimation.setDuration(1500);
         findViewById(R.id.rl_splash).startAnimation(alphaAnimation);
+        downLoadTextView = (TextView) findViewById(R.id.down_load_progress_tv);
     }
 
     private void checkVersion() {
@@ -90,8 +133,8 @@ public class SplashActivity extends Activity {
                         Log.e(TAG,"zhaoxu updateInfo : " + updataInfo);
                         JSONObject jsonObject = new JSONObject(updataInfo);
                         String version = (String) jsonObject.get("version");
-                        String description = (String) jsonObject.get("description");
-                        String apkurl = (String) jsonObject.get("apkurl");
+                        description = (String) jsonObject.get("description");
+                        apkurl = (String) jsonObject.get("apkurl");
                         if (getVersionCode().equals(version)) {
                             message.what = ENTER_HOME;
                         } else {
@@ -127,5 +170,43 @@ public class SplashActivity extends Activity {
             e.printStackTrace();
         }
         return "";
+    }
+
+    private class ajaxCallBack extends AjaxCallBack<File> {
+        @Override
+        public void onStart() {
+            super.onStart();
+            Log.e(TAG,"下载开始");
+        }
+
+        @Override
+        public void onLoading(long count, long current) {
+            super.onLoading(count, current);
+            Log.e(TAG,"下载中");
+            int progress = (int) (current * 100 / count);
+            downLoadTextView.setText("下载进度：" + progress + "%");
+        }
+
+        @Override
+        public void onSuccess(File file) {
+            super.onSuccess(file);
+            Log.e(TAG,"下载成功");
+            installAPK(file);
+        }
+
+        @Override
+        public void onFailure(Throwable t, int errorNo, String strMsg) {
+            super.onFailure(t, errorNo, strMsg);
+            Log.e(TAG,"下载失败 : " + errorNo + strMsg);
+            Toast.makeText(SplashActivity.this,"下载失败",Toast.LENGTH_LONG);
+        }
+    }
+
+    private void installAPK(File file) {
+            Intent intent = new Intent();
+            intent.setAction("android.intent.action.VIEW");
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            startActivity(intent);
     }
 }
