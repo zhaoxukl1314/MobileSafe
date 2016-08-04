@@ -1,10 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.zhaoxu.mobilesafe"
     android:versionCode="2"
     android:versionName="2.0">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -12,16 +28,54 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <uses-library android:name="android.test.runner" />
 
-        <activity android:name=".Activity.SplashActivity"
+        <activity
+            android:name=".Activity.SplashActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.HomeActivity"/>
+        <activity android:name=".Activity.HomeActivity" />
+        <activity android:name=".Activity.SettingActivity" />
+        <activity android:name=".Activity.LostFindActivity" />
+        <activity android:name=".Activity.Setup1Activity" />
+        <activity android:name=".Activity.Setup2Activity" />
+        <activity android:name=".Activity.Setup3Activity" />
+        <activity android:name=".Activity.Setup4Activity" />
+        <activity android:name=".Activity.SelectContactActivity" />
+        <activity android:name=".Activity.AToolsActivity" />
+        <activity android:name=".Activity.NumberAddressActivity" />
+        <activity android:name=".Activity.CallSmsSafeActivity" />
 
+        <receiver android:name=".receiver.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.SMSReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".Service.LocationService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Service.AddressService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Service.CallSmsSafeService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".Activity.AppManagerActivity"></activity>
     </application>
 
 </manifest>

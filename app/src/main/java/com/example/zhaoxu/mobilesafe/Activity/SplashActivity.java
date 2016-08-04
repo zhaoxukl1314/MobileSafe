@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,8 @@ import net.tsz.afinal.http.AjaxCallBack;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -106,11 +110,45 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash_activity);
         TextView textView_version = (TextView) findViewById(R.id.tv_splash_version);
         textView_version.setText("版本号：" + getVersionCode());
-        checkVersion();
+        SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
+        boolean update = sharedPreferences.getBoolean("update",false);
+        if (update) {
+            checkVersion();
+        } else {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    enterHome();
+                }
+            },2000);
+        }
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.2f,1.0f);
         alphaAnimation.setDuration(1500);
         findViewById(R.id.rl_splash).startAnimation(alphaAnimation);
         downLoadTextView = (TextView) findViewById(R.id.down_load_progress_tv);
+        copyDB();
+    }
+
+    private void copyDB() {
+        try {
+            File file = new File(getFilesDir(),"address.db");
+            Log.e(TAG,"zhaoxu DB file : " + file);
+            if (file.exists() && file.length() > 0) {
+                Log.e(TAG,"号码查询地址数据库已存在");
+                return;
+            }
+            InputStream open = getAssets().open("address.db");
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = open.read(buffer)) != -1) {
+                fileOutputStream.write(buffer,0,len);
+            }
+            fileOutputStream.close();
+            open.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkVersion() {
@@ -184,6 +222,7 @@ public class SplashActivity extends Activity {
             super.onLoading(count, current);
             Log.e(TAG,"下载中");
             int progress = (int) (current * 100 / count);
+            downLoadTextView.setVisibility(View.VISIBLE);
             downLoadTextView.setText("下载进度：" + progress + "%");
         }
 

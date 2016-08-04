@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:zhaoxu="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="设置中心"
+        android:textSize="40dp"
+        android:textColor="#000000"
+        android:background="#8800FF00"/>
+
+    <com.example.zhaoxu.mobilesafe.View.SettingItemView
+        zhaoxu:text_title = "开启自动更新通知"
+        zhaoxu:desc_on = "自动更新已开启"
+        zhaoxu:desc_off = "自动更新已取消"
+        android:id="@+id/setting_siv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.example.zhaoxu.mobilesafe.View.SettingItemView
+        zhaoxu:text_title = "号码归属地查询"
+        zhaoxu:desc_on = "号码归属地查询已开启"
+        zhaoxu:desc_off = "号码归属地查询已取消"
+        android:id="@+id/setting_siv_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.example.zhaoxu.mobilesafe.View.SettingClickView
+        android:background="@drawable/text_shape"
+        android:id="@+id/setting_click_toast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.example.zhaoxu.mobilesafe.View.SettingItemView
+        zhaoxu:text_title = "黑名单拦截设置"
+        zhaoxu:desc_on = "黑名单拦截已开启"
+        zhaoxu:desc_off = "黑名单拦截已取消"
+        android:id="@+id/setting_siv_callsms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
