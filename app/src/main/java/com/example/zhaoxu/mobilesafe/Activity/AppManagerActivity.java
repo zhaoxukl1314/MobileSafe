@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
@@ -84,9 +85,29 @@ public class AppManagerActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView = new TextView(AppManagerActivity.this);
-            textView.setText(appinfos.get(position).toString());
-            return textView;
+            View view;
+            ViewHolder viewHolder;
+            if (convertView != null) {
+                view = convertView;
+                viewHolder = (ViewHolder) view.getTag();
+            } else {
+                viewHolder = new ViewHolder();
+                view = View.inflate(getApplicationContext(), R.layout.app_item_adapter, null);
+                viewHolder.icon = (ImageView) view.findViewById(R.id.app_info_image);
+                viewHolder.name = (TextView) view.findViewById(R.id.app_info_name);
+                viewHolder.location = (TextView) view.findViewById(R.id.app_info_location);
+                view.setTag(viewHolder);
+            }
+            AppInfo appInfo = appinfos.get(position);
+            viewHolder.icon.setImageDrawable(appInfo.getDrawable());
+            viewHolder.name.setText(appInfo.getName());
+            return view;
         }
+    }
+
+    private class ViewHolder {
+        public ImageView icon;
+        public TextView name;
+        public TextView location;
     }
 }
