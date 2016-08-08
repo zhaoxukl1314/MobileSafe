@@ -1,18 +1,24 @@
 package com.example.zhaoxu.mobilesafe.Activity;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +40,7 @@ public class AppManagerActivity extends Activity {
     private MyAppListAdapter appListAdapter;
     private List<AppInfo> userInfos;
     private List<AppInfo> systemInfos;
+    private PopupWindow popupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +70,44 @@ public class AppManagerActivity extends Activity {
                     }
                 }
                 runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
                     @Override
                     public void run() {
                         ll_loading.setVisibility(View.GONE);
                         appListAdapter = new MyAppListAdapter();
                         app_list.setAdapter(appListAdapter);
+                        app_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                dismissPopupWindow();
+                                View convertView = View.inflate(AppManagerActivity.this, R.layout.pop_window_item, null);
+                                popupWindow = new PopupWindow(convertView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                int[] location = new int[2];
+                                view.getLocationInWindow(location);
+                                popupWindow.showAtLocation(parent, Gravity.LEFT | Gravity.TOP, location[0], location[1]);
+                            }
+                        });
+                        app_list.setOnScrollListener(new AbsListView.OnScrollListener() {
+                            @Override
+                            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                            }
+
+                            @Override
+                            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                dismissPopupWindow();
+                            }
+                        });
                     }
                 });
             }
         }).start();
+    }
+
+    private void dismissPopupWindow() {
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.dismiss();
+        }
     }
 
     private long getAvailableSize(String path) {
@@ -148,5 +184,11 @@ public class AppManagerActivity extends Activity {
         public ImageView icon;
         public TextView name;
         public TextView location;
+    }
+
+    @Override
+    protected void onDestroy() {
+        dismissPopupWindow();
+        super.onDestroy();
     }
 }
