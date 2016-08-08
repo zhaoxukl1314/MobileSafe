@@ -1,6 +1,7 @@
 package com.example.zhaoxu.mobilesafe.Engine;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -24,6 +25,17 @@ public class AppInfoProvider {
             String packageName = packageInfo.packageName;
             String name = packageInfo.applicationInfo.loadLabel(pm).toString();
             Drawable drawable = packageInfo.applicationInfo.loadIcon(pm);
+            int flags = packageInfo.applicationInfo.flags;
+            if ((flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                appInfo.setUserApp(true);
+            } else {
+                appInfo.setUserApp(false);
+            }
+            if ((flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) == 0) {
+                appInfo.setInRom(true);
+            } else {
+                appInfo.setInRom(false);
+            }
             appInfo.setPackageName(packageName);
             appInfo.setName(name);
             appInfo.setDrawable(drawable);

@@ -1,6 +1,7 @@
 package com.example.zhaoxu.mobilesafe.Activity;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.zhaoxu.mobilesafe.Engine.AppInfoProvider;
@@ -20,6 +22,7 @@ import com.example.zhaoxu.mobilesafe.R;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
@@ -29,6 +32,8 @@ public class AppManagerActivity extends Activity {
     private List<AppInfo> appinfos;
     private LinearLayout ll_loading;
     private MyAppListAdapter appListAdapter;
+    private List<AppInfo> userInfos;
+    private List<AppInfo> systemInfos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +48,20 @@ public class AppManagerActivity extends Activity {
         app_list = (ListView) findViewById(R.id.list_app_info);
         ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
         ll_loading.setVisibility(View.VISIBLE);
+        userInfos = new ArrayList<>();
+        systemInfos = new ArrayList<>();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 appinfos = AppInfoProvider.getAppInfos(AppManagerActivity.this);
+                for (AppInfo appInfo: appinfos) {
+                    if (appInfo.isUserApp()) {
+                        userInfos.add(appInfo);
+                    } else {
+                        systemInfos.add(appInfo);
+                    }
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -70,7 +84,7 @@ public class AppManagerActivity extends Activity {
     private class MyAppListAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            return appinfos.size();
+            return appinfos.size() + 2;
         }
 
         @Override
@@ -87,7 +101,28 @@ public class AppManagerActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
             ViewHolder viewHolder;
-            if (convertView != null) {
+            AppInfo appInfo;
+            if (position == 0) {
+                TextView textView = new TextView(AppManagerActivity.this);
+                textView.setText("用户程序: " + userInfos.size());
+                textView.setBackgroundColor(Color.GRAY);
+                textView.setTextColor(Color.WHITE);
+                return textView;
+            } else if (position == (userInfos.size() + 1)) {
+                TextView textView = new TextView(AppManagerActivity.this);
+                textView.setText("系统程序: " + systemInfos.size());
+                textView.setBackgroundColor(Color.GRAY);
+                textView.setTextColor(Color.WHITE);
+                return textView;
+            } else if (position <= userInfos.size()) {
+                int newPosition = position - 1;
+                appInfo = userInfos.get(newPosition);
+            } else {
+                int newPosition = position - userInfos.size() - 2;
+                appInfo = systemInfos.get(newPosition);
+            }
+
+            if (convertView != null && convertView instanceof RelativeLayout) {
                 view = convertView;
                 viewHolder = (ViewHolder) view.getTag();
             } else {
@@ -98,9 +133,13 @@ public class AppManagerActivity extends Activity {
                 viewHolder.location = (TextView) view.findViewById(R.id.app_info_location);
                 view.setTag(viewHolder);
             }
-            AppInfo appInfo = appinfos.get(position);
             viewHolder.icon.setImageDrawable(appInfo.getDrawable());
             viewHolder.name.setText(appInfo.getName());
+            if (appInfo.isInRom()) {
+                viewHolder.location.setText("手机内存");
+            } else {
+                viewHolder.location.setText("外部存储");
+            }
             return view;
         }
     }
