@@ -50,6 +50,7 @@
         <activity android:name=".Activity.AToolsActivity" />
         <activity android:name=".Activity.NumberAddressActivity" />
         <activity android:name=".Activity.CallSmsSafeActivity" />
+        <activity android:name=".Activity.AppTaskActivity"/>
 
         <receiver android:name=".receiver.BootCompleteReceiver">
             <intent-filter>
